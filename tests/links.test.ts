@@ -116,6 +116,28 @@ describe('Links & Multi-Agent Harness Parity', () => {
       (fs as any).existsSync = origExists;
     }
 
+    // accessiblePair succeeds deterministically on all platforms
+    try {
+      (fs as any).readdirSync = () => ['AGENTS.md'];
+      (fs as any).existsSync = () => true;
+      (fs as any).lstatSync = () => ({ isSymbolicLink: () => false });
+      expect(isSameCaseInsensitiveFile(tmpDir, 'agents.md', 'AGENTS.md')).toBe(true);
+    } finally {
+      (fs as any).readdirSync = origReaddir;
+      (fs as any).existsSync = origExists;
+      (fs as any).lstatSync = origLstat;
+    }
+
+    // accessiblePair when existsSync returns false
+    try {
+      (fs as any).readdirSync = () => ['AGENTS.md'];
+      (fs as any).existsSync = () => false;
+      expect(isSameCaseInsensitiveFile(tmpDir, 'agents.md', 'AGENTS.md')).toBe(false);
+    } finally {
+      (fs as any).readdirSync = origReaddir;
+      (fs as any).existsSync = origExists;
+    }
+
     // accessiblePair exists but lstat throws
     try {
       (fs as any).readdirSync = () => ['AGENTS.md'];
