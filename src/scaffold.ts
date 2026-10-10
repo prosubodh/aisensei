@@ -7,6 +7,9 @@ import { initGit } from './repo.js';
 
 export { getTemplateDir };
 
+/**
+ * Canonical list of core pedagogical template files and directories.
+ */
 export const TEMPLATE_ITEMS: readonly string[] = [
   'AGENTS.md',
   'memory.md',
@@ -23,31 +26,63 @@ export const TEMPLATE_ITEMS: readonly string[] = [
   'LICENSE'
 ];
 
+/**
+ * Options configuring workspace scaffolding.
+ */
 export interface ScaffoldOptions {
+  /** Target directory path where the workspace will be created */
   targetDir?: string;
+  /** Initial learning topic to seed into .tutor/curriculum.json */
   topic?: string;
+  /** Overwrite non-empty targets if true */
   force?: boolean;
+  /** Skip git repository initialization if true */
   noGit?: boolean;
+  /** Explicit path to aisensei template root */
   templateDir?: string;
+  /** Simulate file operations without writing to disk if true */
   dryRun?: boolean;
+  /** Suppress terminal console logging if true */
   silent?: boolean;
 }
 
+/**
+ * Result report from executing a scaffolding operation.
+ */
 export interface ScaffoldResult {
+  /** True if scaffolding completed without fatal errors */
   success: boolean;
+  /** Absolute path of the scaffolded directory */
   targetDir: string;
+  /** True if git repository was initialized and committed */
   gitInitialized: boolean;
+  /** True if run in dry-run simulation mode */
   dryRun: boolean;
+  /** List of recorded file and directory actions */
   actions: string[];
 }
 
+/**
+ * Options for validating target directory safety and emptiness.
+ */
 export interface ValidateTargetOptions {
+  /** Template directory against which target is validated */
   templateDir?: string;
+  /** If true, allow non-empty target directories */
   force?: boolean;
+  /** If true, skip directory emptiness checks */
   dryRun?: boolean;
+  /** If true, allow scaffolding into system-protected directories */
   allowProtected?: boolean;
 }
 
+/**
+ * Validates that candidate target directory is safe, writable, and not system-protected.
+ *
+ * @param targetDir - Candidate destination directory
+ * @param options - Validation settings
+ * @throws {ScaffoldError} When target is a template root, protected directory, or non-empty
+ */
 export function validateTarget(
   targetDir: string,
   options: ValidateTargetOptions = {}
@@ -90,6 +125,14 @@ export function validateTarget(
   }
 }
 
+/**
+ * Recursively copies a file or directory tree from source to destination.
+ *
+ * @param src - Source file or directory path
+ * @param dest - Destination file or directory path
+ * @param dryRun - When true, records actions without touching the disk
+ * @param actions - Audit list tracking file operations
+ */
 export function copyTemplateItem(
   src: string,
   dest: string,
@@ -116,6 +159,13 @@ export function copyTemplateItem(
   }
 }
 
+/**
+ * Scaffolds an aisensei deep-learning workspace with pedagogical governance rules,
+ * multi-agent harness aliases, prerequisite DAG, and exercises sandbox.
+ *
+ * @param options - Scaffolding configuration settings
+ * @returns ScaffoldResult summarizing created assets and git status
+ */
 export function scaffold(options: ScaffoldOptions = {}): ScaffoldResult {
   const targetDir = path.resolve(options.targetDir || process.cwd());
   const templateDir = path.resolve(options.templateDir || getTemplateDir());
@@ -187,4 +237,5 @@ export function scaffold(options: ScaffoldOptions = {}): ScaffoldResult {
   };
 }
 
+/** Default scaffold module exports. */
 export default { scaffold, validateTarget, TEMPLATE_ITEMS, getTemplateDir };

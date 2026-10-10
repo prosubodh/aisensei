@@ -15,15 +15,31 @@ export type ScaffoldErrorCode =
   | 'E_COGNITIVE_OVERLOAD'
   | 'E_INVALID_CURRICULUM';
 
+/**
+ * Shape of custom aisensei errors containing error codes and optional targets.
+ */
 export interface ScaffoldErrorShape extends Error {
+  /** Machine-readable error code */
   code: ScaffoldErrorCode;
+  /** Optional file or directory target associated with the error */
   target?: string;
 }
 
+/**
+ * Custom error class thrown for scaffolding, target validation, and DAG violations.
+ */
 export class ScaffoldError extends Error implements ScaffoldErrorShape {
+  /** Machine-readable error code */
   public readonly code: ScaffoldErrorCode;
+  /** Optional target path associated with the error */
   public readonly target?: string;
 
+  /**
+   * Constructs a new ScaffoldError instance.
+   * @param code Machine-readable error code.
+   * @param message Human-readable error message.
+   * @param target Optional target path related to the error.
+   */
   constructor(code: ScaffoldErrorCode, message: string, target?: string) {
     super(message);
     this.name = 'ScaffoldError';
@@ -33,6 +49,9 @@ export class ScaffoldError extends Error implements ScaffoldErrorShape {
   }
 }
 
+/**
+ * Lookup dictionary of standard machine-readable error code constants.
+ */
 export const ERROR_CODES = {
   TARGET_IS_TEMPLATE: 'E_TARGET_IS_TEMPLATE' as const,
   TARGET_NOT_EMPTY: 'E_TARGET_NOT_EMPTY' as const,

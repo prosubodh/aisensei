@@ -21,6 +21,10 @@ const pkg: PackageJsonShape = JSON.parse(
   )
 );
 
+/**
+ * Prints the aisensei CLI help banner, command list, options, and usage examples.
+ * @param out Output sink function, defaults to `console.log`.
+ */
 export function printHelp(out: (msg: string) => void = console.log): void {
   out(`
 🥋 aisensei v${pkg.version}
@@ -58,10 +62,20 @@ Examples:
 `);
 }
 
+/**
+ * Prints the currently installed aisensei package version.
+ * @param out Output sink function, defaults to `console.log`.
+ */
 export function printVersion(out: (msg: string) => void = console.log): void {
   out(pkg.version);
 }
 
+/**
+ * Executes the aisensei CLI command dispatcher with parsed command-line arguments.
+ * Supports scaffolding, check/validation, terminal/HTML dashboards, DAG inspection, and active recall quizzes.
+ * @param argv Command-line argument vector (defaults to `process.argv.slice(2)`).
+ * @returns Exit code (0 for success, 1 for error).
+ */
 export async function runCli(argv: string[] = process.argv.slice(2)): Promise<number> {
   const parsed = parseArgs(argv);
 
@@ -165,6 +179,9 @@ export async function runCli(argv: string[] = process.argv.slice(2)): Promise<nu
   }
 }
 
+/**
+ * Main command-line entrypoint invoking runCli and exiting the process with the returned status code.
+ */
 export async function main(): Promise<void> {
   try {
     const code = await runCli(process.argv.slice(2));
@@ -175,4 +192,5 @@ export async function main(): Promise<void> {
   }
 }
 
+/** Default CLI module exports. */
 export default { runCli, main, printHelp, printVersion };

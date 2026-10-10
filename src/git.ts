@@ -1,6 +1,9 @@
 import cp from 'node:child_process';
 import { ScaffoldError, ERROR_CODES } from './errors.js';
 
+/**
+ * Strict allowlist of git subcommands permitted to execute through the aisensei runner.
+ */
 export const GIT_ALLOWED_SUBCOMMANDS: Set<string> = new Set([
   'rev-parse',
   'init',
@@ -11,6 +14,14 @@ export const GIT_ALLOWED_SUBCOMMANDS: Set<string> = new Set([
   'log'
 ]);
 
+/**
+ * Executes a git command with strict subcommand allowlisting and non-shell safety.
+ *
+ * @param args - Command line arguments passed to git (e.g. `['status', '--porcelain']`)
+ * @param options - Additional child_process execution options
+ * @returns Standard output from the git invocation as a string
+ * @throws {ScaffoldError} When args are invalid or subcommand is not in GIT_ALLOWED_SUBCOMMANDS
+ */
 export function runGit(args: string[], options: cp.ExecFileSyncOptions = {}): string {
   if (!Array.isArray(args) || args.length === 0) {
     throw new ScaffoldError('E_GIT_ARGS_INVALID', ERROR_CODES.GIT_ARGS_INVALID);
@@ -27,4 +38,5 @@ export function runGit(args: string[], options: cp.ExecFileSyncOptions = {}): st
   }) as string;
 }
 
+/** Default Git execution module exports. */
 export default { GIT_ALLOWED_SUBCOMMANDS, runGit };

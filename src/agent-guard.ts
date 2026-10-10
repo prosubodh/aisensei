@@ -1,21 +1,43 @@
 import path from 'node:path';
 
+/**
+ * Result outcome returned by pedagogical guard evaluation.
+ */
 export interface GuardDecision {
+  /** True if the tool invocation is compliant and allowed to proceed */
   allowed: boolean;
+  /** Diagnostic pedagogical explanation if the tool invocation is blocked */
   reason?: string;
+  /** Categorical invariant source that triggered the refusal */
   source?: 'spoonfeed' | 'prerequisite' | 'score' | 'command';
 }
 
+/**
+ * Standard tool invocation envelope format accepted by pre-tool hooks.
+ */
 export interface ToolEnvelope {
+  /** Name of the tool invoked by the agent */
   tool_name?: string;
+  /** Parameter object passed to the tool */
   tool_input?: Record<string, unknown>;
 }
 
+/**
+ * Options configuring real-time agent guard evaluation.
+ */
 export interface GuardOptions {
+  /** Root directory of the learning workspace */
   workspaceRoot?: string;
+  /** Calibrated minimum score required to clear gates (defaults to 7.0) */
   minMasteryThreshold?: number;
 }
 
+/**
+ * Safely parses a raw JSON tool invocation string into a ToolEnvelope object.
+ *
+ * @param raw - Raw string representation of the tool payload
+ * @returns ToolEnvelope object or null if parsing fails
+ */
 export function parseEnvelope(raw: string): ToolEnvelope | null {
   try {
     const trimmed = raw.trim();
@@ -33,6 +55,14 @@ function extractKey(input: Record<string, unknown>, keys: readonly string[]): st
   return undefined;
 }
 
+/**
+ * Inspects candidate file writes to enforce anti-spoonfeeding rules in exercises/
+ * and calibrated score bounds in .tutor/curriculum.json.
+ *
+ * @param filePath - Path of the file being created or edited
+ * @param content - Content to be written into the file
+ * @returns GuardDecision indicating whether the write is permitted
+ */
 export function inspectFileWrite(filePath: string, content: string): GuardDecision {
   const normalized = filePath.replace(/\\/g, '/');
 
@@ -82,6 +112,13 @@ export function inspectFileWrite(filePath: string, content: string): GuardDecisi
   return { allowed: true };
 }
 
+/**
+ * Inspects candidate terminal shell commands to prevent accidental deletion
+ * of governance directories (.tutor, .agents).
+ *
+ * @param cmd - Shell command string about to be executed
+ * @returns GuardDecision indicating whether the command is permitted
+ */
 export function inspectCommand(cmd: string): GuardDecision {
   const trimmed = cmd.trim();
 
@@ -97,6 +134,13 @@ export function inspectCommand(cmd: string): GuardDecision {
   return { allowed: true };
 }
 
+/**
+ * Unified PreToolUse guard hook for AI pair programmers and agentic coding tutors.
+ * Intercepts tool calls before execution to preserve educational integrity.
+ *
+ * @param envelope - ToolEnvelope object or raw JSON string
+ * @returns GuardDecision allowing or blocking tool execution
+ */
 export function inspectPreTool(envelope: ToolEnvelope | string): GuardDecision {
   const env: ToolEnvelope | null =
     typeof envelope === 'string' ? parseEnvelope(envelope) : envelope;
@@ -137,6 +181,7 @@ export function inspectPreTool(envelope: ToolEnvelope | string): GuardDecision {
   return { allowed: true };
 }
 
+/** Default agent guard module exports. */
 export default {
   inspectFileWrite,
   inspectCommand,

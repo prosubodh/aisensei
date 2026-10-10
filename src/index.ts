@@ -1,5 +1,5 @@
 /**
- * @module @azlearndr/aisensei
+ * @module @aisensei/aisensei
  * Pedagogical governance toolkit and deep learning workspace for AI-assisted mastery.
  */
 

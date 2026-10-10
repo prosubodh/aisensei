@@ -1,15 +1,24 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+/**
+ * Schema representing the active curriculum and learner mastery progress.
+ */
 export interface CurriculumData {
+  /** Active learning topic */
   activeTopic?: string;
+  /** High-level academic or technical domain categorization */
   domainAnalysis?: {
     category?: string;
     subdomains?: string[];
   };
+  /** Estimated study duration in weeks */
   totalDurationWeeks?: number;
+  /** Estimated study duration in hours */
   totalHours?: number;
+  /** Current Bloom's cognitive taxonomy phase */
   currentPhase?: string;
+  /** Completion records per learning phase */
   phases?: Record<
     string,
     {
@@ -18,16 +27,27 @@ export interface CurriculumData {
       topics?: string[];
     }
   >;
+  /** Prerequisite dependencies and their current scores */
   prerequisites?: Array<{
     name: string;
     status: string;
     score: number;
   }>;
+  /** Calibrated scores per concept on the 0-10 scale */
   scores?: Record<string, number>;
+  /** Estimated knowledge retention percentage (0-100) */
   retentionRate?: number;
+  /** Array of earned mastery badge identifiers */
   badgesEarned?: string[];
 }
 
+/**
+ * Generates an ASCII visual progress bar for terminal CLI telemetry.
+ *
+ * @param percent - Completion percentage (0 to 100)
+ * @param width - Bar width in characters (defaults to 20)
+ * @returns Formatted ASCII bar string e.g. `[█████░░░░░] 50%`
+ */
 export function renderProgressBar(percent: number, width = 20): string {
   const bounded = Math.max(0, Math.min(100, percent));
   const filled = Math.round((bounded / 100) * width);
@@ -35,12 +55,24 @@ export function renderProgressBar(percent: number, width = 20): string {
   return `[${'█'.repeat(filled)}${'░'.repeat(empty)}] ${bounded}%`;
 }
 
+/**
+ * Generates a calibrated 0-10 score gauge with filled star glyphs.
+ *
+ * @param score - Numeric score on the 0-10 calibrated scale
+ * @returns Formatted score gauge string e.g. `8.0/10 ★★★★☆`
+ */
 export function renderScoreGauge(score: number): string {
   const bounded = Math.max(0, Math.min(10, score));
   const stars = '★'.repeat(Math.round(bounded / 2)) + '☆'.repeat(5 - Math.round(bounded / 2));
   return `${bounded.toFixed(1)}/10 ${stars}`;
 }
 
+/**
+ * Loads and parses the workspace curriculum file from .tutor/curriculum.json.
+ *
+ * @param workspaceRoot - Path to workspace root directory
+ * @returns Parsed CurriculumData object or null if missing/corrupt
+ */
 export function loadCurriculum(workspaceRoot: string): CurriculumData | null {
   const curriculumPath = path.join(workspaceRoot, '.tutor', 'curriculum.json');
   if (!fs.existsSync(curriculumPath)) return null;
@@ -51,6 +83,12 @@ export function loadCurriculum(workspaceRoot: string): CurriculumData | null {
   }
 }
 
+/**
+ * Renders an ASCII text dashboard summary to the terminal.
+ *
+ * @param workspaceRoot - Path to workspace root directory
+ * @returns Formatted multi-line ASCII dashboard
+ */
 export function renderTerminalDashboard(workspaceRoot: string): string {
   const data = loadCurriculum(workspaceRoot);
   if (!data) {
@@ -97,6 +135,12 @@ export function renderTerminalDashboard(workspaceRoot: string): string {
   return lines.join('\n');
 }
 
+/**
+ * Generates an interactive, standalone HTML learning dashboard in .tutor/dashboard.html.
+ *
+ * @param workspaceRoot - Path to workspace root directory
+ * @returns Absolute path to generated dashboard.html file
+ */
 export function generateHtmlDashboard(workspaceRoot: string): string {
   const data = loadCurriculum(workspaceRoot) || {
     activeTopic: 'General Mastery',
@@ -180,6 +224,7 @@ export function generateHtmlDashboard(workspaceRoot: string): string {
   return dashboardPath;
 }
 
+/** Default learning dashboard and telemetry module exports. */
 export default {
   renderTerminalDashboard,
   generateHtmlDashboard,

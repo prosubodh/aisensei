@@ -1,34 +1,63 @@
 import { ScaffoldError, ERROR_CODES } from './errors.js';
 
+/**
+ * Node representing an individual learning concept in the prerequisite graph.
+ */
 export interface ConceptNode {
+  /** Unique concept identifier */
   id: string;
+  /** Human-readable concept title */
   name: string;
+  /** Associated Bloom's taxonomy learning phase */
   phase?: 'Foundation' | 'Development' | 'Advanced' | 'Mastery';
+  /** Array of prerequisite concept IDs required before learning this node */
   prerequisites: string[];
 }
 
+/**
+ * Directed graph mapping concept IDs to ConceptNode entries.
+ */
 export type ConceptGraph = Record<string, ConceptNode>;
 
+/**
+ * Evaluated mastery and progression state for an individual concept node.
+ */
 export interface MasteryEvaluation {
+  /** Unique concept identifier */
   id: string;
+  /** Concept title */
   name: string;
+  /** Progression status based on prerequisite clearance and calibrated score */
   status: 'locked' | 'unlocked' | 'in_progress' | 'mastered';
+  /** Current calibrated mastery score (0-10 scale) */
   score?: number;
+  /** List of unmet prerequisite concept IDs blocking this concept */
   missingPrerequisites: string[];
 }
 
+/**
+ * Spaced repetition memory decay telemetry based on Ebbinghaus forgetting curves.
+ */
 export interface RetentionStatus {
+  /** Concept identifier */
   id: string;
+  /** Concept title */
   name: string;
+  /** Elapsed days since last effortful recall practice */
   daysSinceReview: number;
+  /** Target Leitner interval days for current repetition stage */
   targetIntervalDays: number;
+  /** True if elapsed days exceed scheduled target interval */
   isDueForReview: boolean;
-  retentionDecayEstimate: number; // 0.0 - 1.0 (estimated retention)
+  /** Estimated remaining retention rate (0.0 to 1.0) */
+  retentionDecayEstimate: number;
 }
 
 /**
- * Detects cycles in a prerequisite dependency graph using Tarjan's / DFS cycle detection.
- * Returns null if acyclic, or the cycle path as an array of IDs if cyclic.
+ * Detects cycles in a prerequisite dependency graph using Tarjan's DFS cycle detection.
+ *
+ * @param graph - The concept dependency graph to inspect
+ * @returns Array representing cycle path if cyclic, or null if acyclic
  */
 export function detectPrerequisiteCycles(graph: ConceptGraph): string[] | null {
   const visited = new Set<string>();
@@ -69,8 +98,12 @@ export function detectPrerequisiteCycles(graph: ConceptGraph): string[] | null {
 }
 
 /**
- * Performs topological sort on the prerequisite DAG.
- * Returns concept IDs in optimal learning sequence.
+ * Performs Kahn's algorithm topological sort on the prerequisite DAG.
+ * Returns concept IDs ordered in their optimal topological learning sequence.
+ *
+ * @param graph - Prerequisite concept graph
+ * @returns Array of concept IDs in dependency-resolved order
+ * @throws {ScaffoldError} When a cyclic dependency loop is detected
  */
 export function topologicalSort(graph: ConceptGraph): string[] {
   const cycle = detectPrerequisiteCycles(graph);
@@ -120,8 +153,13 @@ export function topologicalSort(graph: ConceptGraph): string[] {
 }
 
 /**
- * Evaluates mastery and unlock status across the graph.
- * Mastery threshold defaults to 7 (out of 10).
+ * Evaluates unlock status and mastery gates across the concept graph.
+ * Progression requires score >= masteryThreshold (defaults to 7.0 / 10).
+ *
+ * @param graph - Concept dependency graph
+ * @param scores - Dictionary of calibrated learner scores (0-10)
+ * @param masteryThreshold - Gate score threshold (defaults to 7)
+ * @returns Dictionary mapping concept IDs to MasteryEvaluation records
  */
 export function evaluateGraphMastery(
   graph: ConceptGraph,
@@ -166,8 +204,16 @@ export function evaluateGraphMastery(
 }
 
 /**
- * Calculates Ebbinghaus spaced repetition decay and due dates.
- * Standard Leitner intervals: 1, 3, 7, 14, 30, 60 days.
+ * Calculates Ebbinghaus spaced repetition memory decay and scheduled review intervals.
+ * Uses calibrated Leitner intervals (1, 3, 7, 14, 30, 60 days).
+ *
+ * @param conceptId - Concept identifier
+ * @param conceptName - Concept title
+ * @param lastReviewedIso - ISO timestamp string of the last review session
+ * @param repetitionCount - Count of successful recalls completed
+ * @param score - Most recent score on the 0-10 scale
+ * @param now - Reference current Date (defaults to new Date())
+ * @returns RetentionStatus object with retention rate and due date calculation
  */
 export function calculateRetention(
   conceptId: string,
@@ -188,8 +234,8 @@ export function calculateRetention(
   // Half-life decay model: R = e^(-t / S), where S scales with repetition & score
   const stability = targetIntervalDays * (score / 10);
   const retentionDecayEstimate = Math.max(
-    0,
-    Math.min(1, Math.exp(-daysSinceReview / Math.max(1, stability)))
+    0.05,
+    Math.min(1.0, Math.exp(-daysSinceReview / Math.max(0.1, stability)))
   );
 
   const isDueForReview = daysSinceReview >= targetIntervalDays;
@@ -200,6 +246,14 @@ export function calculateRetention(
     daysSinceReview,
     targetIntervalDays,
     isDueForReview,
-    retentionDecayEstimate: Math.round(retentionDecayEstimate * 100) / 100
+    retentionDecayEstimate
   };
 }
+
+/** Default DAG and prerequisite graph module exports. */
+export default {
+  detectPrerequisiteCycles,
+  topologicalSort,
+  evaluateGraphMastery,
+  calculateRetention
+};

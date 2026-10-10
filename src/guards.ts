@@ -7,6 +7,8 @@ import { ScaffoldError, ERROR_CODES } from './errors.js';
 
 /**
  * Resolves the root filesystem directory of the aisensei template files.
+ *
+ * @returns Absolute path to template directory
  */
 export function getTemplateDir(): string {
   const currentDir = import.meta.dirname ?? path.dirname(fileURLToPath(import.meta.url));
@@ -17,15 +19,24 @@ export function getTemplateDir(): string {
  * Options for configuring protected target verification.
  */
 export interface ProtectedTargetOptions {
+  /** Template directory to test ancestry against */
   templateDir?: string;
+  /** Force overwrite */
   force?: boolean;
+  /** Dry-run mode */
   dryRun?: boolean;
+  /** Allow protected target override */
   allowProtected?: boolean;
 }
 
 /**
  * Filesystem scope guard.
  * Constrains all reads/writes to root, throwing if candidate escapes root.
+ *
+ * @param root - Boundary directory
+ * @param candidate - File path to inspect
+ * @param message - Optional custom error message
+ * @throws {ScaffoldError} When candidate escapes root directory
  */
 export function assertInside(root: string, candidate: string, message?: string): void {
   const resolvedRoot = path.resolve(root);
@@ -37,7 +48,10 @@ export function assertInside(root: string, candidate: string, message?: string):
 }
 
 /**
- * Normalizes a path for protected-target comparison.
+ * Normalizes a path for protected-target comparison across Windows and POSIX.
+ *
+ * @param p - Path to normalize
+ * @returns Case-normalized resolved path string
  */
 export function normalizeForComparison(p: string): string {
   const resolved = path.resolve(p);
@@ -84,6 +98,10 @@ function resolvesToProtectedLocation(resolvedTarget: string, home: string): bool
 /**
  * Returns true when targetDir is a location that must never be overwritten:
  * the filesystem root, the user's home directory, the home parent, or template ancestor.
+ *
+ * @param targetDir - Candidate destination directory
+ * @param templateDir - Aisensei template root
+ * @returns True if targetDir is a system-protected location
  */
 export function isProtectedTarget(targetDir: string, templateDir: string = getTemplateDir()): boolean {
   const resolvedTarget = path.resolve(targetDir);
@@ -97,3 +115,11 @@ export function isProtectedTarget(targetDir: string, templateDir: string = getTe
 
   return false;
 }
+
+/** Default safety guards and path boundary module exports. */
+export default {
+  getTemplateDir,
+  assertInside,
+  normalizeForComparison,
+  isProtectedTarget
+};

@@ -3,23 +3,45 @@ import path from 'node:path';
 import { detectPrerequisiteCycles } from './dag.js';
 import type { ConceptGraph } from './dag.js';
 
+/**
+ * Aggregate metrics and error counts from architectural validation.
+ */
 export interface ValidationResult {
+  /** Count of critical pedagogical invariant errors */
   errors: number;
+  /** Count of non-fatal warnings */
   warnings: number;
+  /** Count of validated progressive disclosure rules */
   validatedRules: number;
+  /** Count of validated specialized mentorship skills */
   validatedSkills: number;
+  /** Total count of checked links and references */
   totalLinks: number;
+  /** List of broken file paths or markdown links */
   brokenLinks: string[];
 }
 
+/**
+ * Interface for reporting validation progress and diagnostic messages.
+ */
 export interface ValidationReporter {
+  /** Report a successful invariant check */
   pass: (msg: string) => void;
+  /** Report a non-fatal warning */
   warn: (msg: string) => void;
+  /** Report an invariant failure */
   fail: (msg: string) => void;
+  /** General informational log message */
   log: (msg: string) => void;
+  /** Section heading message */
   heading: (msg: string) => void;
 }
 
+/**
+ * Creates an interactive console reporter that writes formatted emoji badges to standard output.
+ *
+ * @returns ValidationReporter instance writing to console.log
+ */
 export function createConsoleReporter(): ValidationReporter {
   return {
     pass: (msg: string) => console.log(`  ✅ PASS: ${msg}`),
@@ -30,11 +52,28 @@ export function createConsoleReporter(): ValidationReporter {
   };
 }
 
+/**
+ * Creates a silent reporter that suppresses all console output during testing or programmatic runs.
+ *
+ * @returns No-op ValidationReporter
+ */
 export function createSilentReporter(): ValidationReporter {
   const noop = (): void => {};
   return { pass: noop, warn: noop, fail: noop, log: noop, heading: noop };
 }
 
+/**
+ * Validates the 5 pedagogical and architectural invariants of an aisensei workspace:
+ * 1. Root configuration & harness aliases (AGENTS.md, CLAUDE.md, etc.)
+ * 2. Progressive disclosure rules in docs/rules/
+ * 3. Mentorship skills in .agents/skills/
+ * 4. Learning Mastery Ledger in memory.md
+ * 5. Curriculum prerequisite DAG in .tutor/curriculum.json
+ *
+ * @param workspaceRoot - Absolute path to workspace root
+ * @param reporter - Progress reporter
+ * @returns ValidationResult with error and warning totals
+ */
 export function validate(
   workspaceRoot: string = process.cwd(),
   reporter: ValidationReporter = createConsoleReporter()
@@ -198,4 +237,5 @@ export function validate(
   };
 }
 
+/** Default pedagogical validation engine module exports. */
 export default { validate, createConsoleReporter, createSilentReporter };

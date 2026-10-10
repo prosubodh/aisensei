@@ -1,10 +1,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+/**
+ * Options configuring symlink and pointer creation.
+ */
 export interface EnsureSymlinkOptions {
+  /** Target directory containing the link */
   targetDir: string;
+  /** Name of the link file to create */
   linkName: string;
+  /** Name of the referenced target file */
   targetFileName: string;
+  /** If true, simulates operation without writing */
   dryRun?: boolean;
 }
 
@@ -67,6 +74,15 @@ function copyFallback(targetDir: string, linkName: string, targetFileName: strin
   }
 }
 
+/**
+ * Accurately determines if two filenames collide on a case-insensitive file system
+ * (e.g. AGENTS.md vs agents.md on Windows/macOS) while preventing self-deletion.
+ *
+ * @param targetDir - Directory containing the files
+ * @param linkName - Candidate link filename
+ * @param targetFileName - Target source filename
+ * @returns True if both filenames identify the same underlying file entity
+ */
 export function isSameCaseInsensitiveFile(
   targetDir: string,
   linkName: string,
@@ -84,6 +100,14 @@ export function isSameCaseInsensitiveFile(
   return accessiblePair(targetPath, linkPath);
 }
 
+/**
+ * Creates a symbolic link for an AI agent harness alias (e.g. CLAUDE.md -\> AGENTS.md),
+ * automatically replacing stale links and falling back to byte-identical file copy
+ * if symlink creation is not permitted by host OS privileges.
+ *
+ * @param options - Link configuration options
+ * @returns True if link or fallback was established
+ */
 export function ensureSymlink(options: EnsureSymlinkOptions): boolean {
   const { targetDir, linkName, targetFileName, dryRun = false } = options;
   if (dryRun) return true;
@@ -99,6 +123,13 @@ export function ensureSymlink(options: EnsureSymlinkOptions): boolean {
   }
 }
 
+/**
+ * Creates a symbolic link or falls back to writing a clean text pointer file
+ * referencing targetFileName if symlink operations fail.
+ *
+ * @param options - Link configuration options
+ * @returns True if symlink or text pointer is active
+ */
 export function ensureSymlinkOrPointer(options: EnsureSymlinkOptions): boolean {
   const { targetDir, linkName, targetFileName, dryRun = false } = options;
   if (dryRun) return true;
@@ -120,6 +151,7 @@ export function ensureSymlinkOrPointer(options: EnsureSymlinkOptions): boolean {
   }
 }
 
+/** Default cross-platform symlink and pointer link module exports. */
 export default {
   isSameCaseInsensitiveFile,
   ensureSymlink,

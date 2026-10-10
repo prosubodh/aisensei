@@ -5,11 +5,22 @@ import { runGit } from './git.js';
 
 const INITIAL_COMMIT_MESSAGE = 'chore: initial scaffold from aisensei template';
 
+/**
+ * Options configuring git repository initialization.
+ */
 export interface InitGitOptions {
+  /** If true, skips git repository initialization */
   noGit?: boolean;
+  /** If true, simulates initialization without writing files */
   dryRun?: boolean;
 }
 
+/**
+ * Checks whether targetDir is located inside an existing git work tree.
+ *
+ * @param targetDir - Directory path to inspect
+ * @returns True if directory is inside a git work tree
+ */
 export function isInsideGitWorkTree(targetDir: string): boolean {
   try {
     const checkDir = fs.existsSync(targetDir) ? targetDir : path.dirname(targetDir);
@@ -67,6 +78,14 @@ function initialCommit(targetDir: string): void {
   }
 }
 
+/**
+ * Initializes a fresh git repository, sets default branch to main,
+ * stages all scaffolded files, and creates an initial commit.
+ *
+ * @param targetDir - Path to scaffolded workspace directory
+ * @param options - Initialization options
+ * @returns True if git repository was successfully created and committed
+ */
 export function initGit(targetDir: string, options: InitGitOptions = {}): boolean {
   const { noGit = false, dryRun = false } = options;
   if (noGit) return false;
@@ -84,4 +103,5 @@ export function initGit(targetDir: string, options: InitGitOptions = {}): boolea
   }
 }
 
+/** Default Git repository initialization module exports. */
 export default { isInsideGitWorkTree, initGit };
