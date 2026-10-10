@@ -1,0 +1,13 @@
+{
+  "name": "@aisensei/aisensei",
+  "version": "1.0.0",
+  "description": "Pedagogical governance toolkit and deep learning workspace for AI-assisted mastery",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": [
+      "src",
+      "README.md",
+      "LICENSE"
+    ]
+  }
+}

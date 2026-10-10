@@ -89,6 +89,9 @@ export function parseArgs(argv: string[]): CliParsedOptions {
     } else if (!result.topic) {
       // If targetDir is already set, second positional can be topic
       result.topic = arg;
+    } else {
+      result.terminal = 'extra-arg';
+      return result;
     }
 
     i++;

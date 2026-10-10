@@ -1,7 +1,7 @@
 import cp from 'node:child_process';
 import { ScaffoldError, ERROR_CODES } from './errors.js';
 
-export const GIT_ALLOWED_SUBCOMMANDS = new Set([
+export const GIT_ALLOWED_SUBCOMMANDS: Set<string> = new Set([
   'rev-parse',
   'init',
   'branch',

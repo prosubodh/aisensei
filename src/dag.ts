@@ -108,7 +108,7 @@ export function topologicalSort(graph: ConceptGraph): string[] {
     const curr = queue.shift()!;
     sorted.push(curr);
 
-    for (const next of dependents[curr] || []) {
+    for (const next of dependents[curr]!) {
       inDegree[next]! -= 1;
       if (inDegree[next] === 0) {
         queue.push(next);

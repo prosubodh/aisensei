@@ -69,10 +69,11 @@ function initialCommit(targetDir: string): void {
 
 export function initGit(targetDir: string, options: InitGitOptions = {}): boolean {
   const { noGit = false, dryRun = false } = options;
-  if (noGit || dryRun) return false;
+  if (noGit) return false;
   const gitDir = path.join(targetDir, '.git');
   if (fs.existsSync(gitDir)) return false;
   if (isInsideGitWorkTree(targetDir)) return false;
+  if (dryRun) return true;
 
   try {
     initRepository(targetDir);

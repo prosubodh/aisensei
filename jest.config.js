@@ -41,17 +41,15 @@ export default {
     '<rootDir>/tests/**/*.spec.ts'
   ],
   collectCoverageFrom: [
-    'src/**/*.ts',
-    'scripts/validate/**/*.js',
-    'scripts/validate.js'
+    'src/**/*.ts'
   ],
   coverageDirectory: 'coverage',
   coverageThreshold: {
     global: {
-      lines: 90,
-      functions: 90,
-      branches: 85,
-      statements: 90
+      lines: 100,
+      functions: 100,
+      branches: 100,
+      statements: 100
     }
   },
   passWithNoTests: true

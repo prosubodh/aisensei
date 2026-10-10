@@ -45,24 +45,30 @@ describe('Prerequisite DAG Engine', () => {
     expect(() => topologicalSort(graph)).toThrow('E_DAG_CYCLE_DETECTED');
   });
 
-  it('evaluates mastery and unlock status across graph', () => {
+  it('evaluates mastery and unlock status across graph with and without default threshold', () => {
     const graph: ConceptGraph = {
       intro: { id: 'intro', name: 'Intro', prerequisites: [] },
       deep: { id: 'deep', name: 'Deep', prerequisites: ['intro'] },
-      expert: { id: 'expert', name: 'Expert', prerequisites: ['deep'] }
+      expert: { id: 'expert', name: 'Expert', prerequisites: ['deep'] },
+      unlockedNode: { id: 'unlockedNode', name: 'Unlocked Node', prerequisites: [] }
     };
 
-    // Intro has 8 (mastered), deep has 0, expert has none
+    // Intro has 8 (mastered), deep has 4 (in_progress), expert has none (locked), unlockedNode has none and no prereqs (unlocked)
     const scores = { intro: 8, deep: 4 };
     const evaluated = evaluateGraphMastery(graph, scores, 7);
 
     expect(evaluated.intro?.status).toBe('mastered');
     expect(evaluated.deep?.status).toBe('in_progress');
     expect(evaluated.expert?.status).toBe('locked');
+    expect(evaluated.unlockedNode?.status).toBe('unlocked');
     expect(evaluated.expert?.missingPrerequisites).toContain('deep');
+
+    // Default threshold (7)
+    const defaultEval = evaluateGraphMastery(graph, scores);
+    expect(defaultEval.intro?.status).toBe('mastered');
   });
 
-  it('calculates retention decay and scheduled intervals', () => {
+  it('calculates retention decay and scheduled intervals with and without default now', () => {
     const now = new Date('2026-10-10T12:00:00Z');
     const past = new Date('2026-10-09T12:00:00Z').toISOString(); // 1 day ago
 
@@ -71,5 +77,9 @@ describe('Prerequisite DAG Engine', () => {
     expect(retention.targetIntervalDays).toBe(1);
     expect(retention.isDueForReview).toBe(true);
     expect(retention.retentionDecayEstimate).toBeGreaterThan(0);
+
+    // Call without 'now' argument (uses default new Date())
+    const defaultNow = calculateRetention('c1', 'Concept 1', new Date().toISOString(), 0, 8);
+    expect(defaultNow.daysSinceReview).toBe(0);
   });
 });

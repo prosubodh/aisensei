@@ -165,10 +165,14 @@ export async function runCli(argv: string[] = process.argv.slice(2)): Promise<nu
   }
 }
 
-export function main(): void {
-  runCli().then((code) => {
-    if (code !== 0) process.exit(code);
-  });
+export async function main(): Promise<void> {
+  try {
+    const code = await runCli(process.argv.slice(2));
+    process.exit(code);
+  } catch (err: any) {
+    console.error('Unexpected error:', err);
+    process.exit(1);
+  }
 }
 
 export default { runCli, main, printHelp, printVersion };
