@@ -1,0 +1,35 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+*.log.*
+
+# Test coverage
+coverage/
+
+# Build artifacts
+lib/
+*.tsbuildinfo
+
+# Pack tarballs
+*.tgz
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local environment
+.env
+.env.local
+.env.*.local
+.npmrc
+.envrc
+
+# Agent scratch space
+.tmp/
+.tmp-scratch/
+
+# Case-insensitive filesystem parity (agents.md is generated/symlinked on Linux, native on macOS/Windows)
+agents.md

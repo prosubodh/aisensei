@@ -1,0 +1,66 @@
+{
+  "activeTopic": "Daylight Saving Time & Global Timekeeping",
+  "domainAnalysis": {
+    "category": "Chronometry, Planetary Mechanics & Systems Engineering",
+    "subdomains": [
+      "Solar Mechanics & Astronomical Time",
+      "History & Geopolitical Policy of DST",
+      "Circadian Biology & Socioeconomic Impact",
+      "Computing Systems, IANA tzdb & Distributed Chronometry"
+    ]
+  },
+  "totalDurationWeeks": 6,
+  "totalHours": 24,
+  "currentPhase": "Development",
+  "phases": {
+    "foundation": {
+      "status": "completed",
+      "completionPercent": 100,
+      "topics": [
+        "Solar Time vs. Standard Time",
+        "Origins and Legislative History of Daylight Saving Time",
+        "The Mechanics of Spring-Forward and Fall-Back"
+      ]
+    },
+    "development": {
+      "status": "in_progress",
+      "completionPercent": 0,
+      "topics": [
+        "Circadian Rhythms and Public Health Implications",
+        "Energy Consumption and Economic Trade-offs",
+        "Global Disparities and Equatorial vs. High-Latitude Variations"
+      ]
+    },
+    "advanced": {
+      "status": "pending",
+      "completionPercent": 0,
+      "topics": [
+        "The IANA Time Zone Database (tzdb / Olson DB)",
+        "UTC vs. Offsets vs. Named Timezones",
+        "Software Hazards: The Ambiguous Hour and the Non-existent Hour"
+      ]
+    },
+    "mastery": {
+      "status": "pending",
+      "completionPercent": 0,
+      "topics": [
+        "Distributed Systems, Cron Schedulers, and Recurring Calendar Events",
+        "Financial Timestamps, Audit Trails, and Clock Skew",
+        "Future of Timekeeping: Permanent Standard vs. Permanent DST Debates"
+      ]
+    }
+  },
+  "prerequisites": [
+    {
+      "name": "UTC, Offsets, and Time Zones",
+      "status": "completed",
+      "score": 6
+    }
+  ],
+  "scores": {
+    "prereq_utc_vs_tz": 6,
+    "foundation_mechanics": 10
+  },
+  "retentionRate": 100,
+  "badgesEarned": ["Genesis", "Precision Score"]
+}

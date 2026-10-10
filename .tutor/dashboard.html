@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>aisensei • Learning Mastery Dashboard</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --heading: #f0f6fc;
+      --accent: #58a6ff;
+      --success: #3fb950;
+      --warn: #d29922;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 2rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+    .header h1 { color: var(--heading); font-size: 1.8rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600; background: #1f6feb33; color: var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+    .card h2 { color: var(--heading); font-size: 1.2rem; margin-bottom: 1rem; }
+    .progress-bar { background: #21262d; border-radius: 4px; height: 10px; overflow: hidden; margin: 0.5rem 0 1rem; }
+    .progress-fill { background: var(--accent); height: 100%; transition: width 0.3s; }
+    .score-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #21262d; }
+    .score-val { font-weight: 600; color: var(--heading); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🥋 aisensei <span class="badge">Development</span></h1>
+      <p>Active Mastery: <strong>Daylight Saving Time & Global Timekeeping</strong></p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h2>Phases</h2>
+        
+          <div><strong>FOUNDATION</strong> (100%)</div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+        
+          <div><strong>DEVELOPMENT</strong> (0%)</div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+        
+          <div><strong>ADVANCED</strong> (0%)</div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+        
+          <div><strong>MASTERY</strong> (0%)</div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+        
+      </div>
+      <div class="card">
+        <h2>Mastery Scores (0-10)</h2>
+        
+          <div class="score-row"><span>prereq_utc_vs_tz</span><span class="score-val">6/10</span></div>
+        
+          <div class="score-row"><span>foundation_mechanics</span><span class="score-val">10/10</span></div>
+        
+      </div>
+    </div>
+  </div>
+</body>
+</html>
